@@ -35,17 +35,17 @@ android {
       val envKeyAlias = System.getenv("KEY_ALIAS")?.ifEmpty { null }
       val envKeyPass = System.getenv("KEY_PASSWORD")?.ifEmpty { null }
 
-      if (keystoreFile.exists() && envStorePass != null) {
+      if (keystoreFile.exists() && keystoreFile.length() > 0L && envStorePass != null) {
         storeFile = keystoreFile
         storePassword = envStorePass
         keyAlias = envKeyAlias ?: "upload"
         keyPassword = envKeyPass ?: envStorePass
-      } else if (uploadKeystore.exists() && envStorePass != null) {
+      } else if (uploadKeystore.exists() && uploadKeystore.length() > 0L && envStorePass != null) {
         storeFile = uploadKeystore
         storePassword = envStorePass
         keyAlias = envKeyAlias ?: "upload"
         keyPassword = envKeyPass ?: envStorePass
-      } else if (debugKeystore.exists()) {
+      } else if (debugKeystore.exists() && debugKeystore.length() > 0L) {
         storeFile = debugKeystore
         storePassword = "android"
         keyAlias = "androiddebugkey"

@@ -28,24 +28,33 @@ android {
       val keystorePath = System.getenv("KEYSTORE_PATH") ?: "${rootDir}/release.keystore"
       val keystoreFile = file(keystorePath)
       val uploadKeystore = file("${rootDir}/my-upload-key.jks")
-      if (keystoreFile.exists()) {
+      val debugKeystore = file("${rootDir}/debug.keystore")
+
+      val envStorePass = System.getenv("KEYSTORE_PASSWORD")?.ifEmpty { null }
+        ?: System.getenv("STORE_PASSWORD")?.ifEmpty { null }
+      val envKeyAlias = System.getenv("KEY_ALIAS")?.ifEmpty { null }
+      val envKeyPass = System.getenv("KEY_PASSWORD")?.ifEmpty { null }
+
+      if (keystoreFile.exists() && envStorePass != null) {
         storeFile = keystoreFile
-        storePassword = System.getenv("KEYSTORE_PASSWORD") ?: System.getenv("STORE_PASSWORD") ?: ""
-        keyAlias = System.getenv("KEY_ALIAS") ?: "upload"
-        keyPassword = System.getenv("KEY_PASSWORD") ?: ""
-      } else if (uploadKeystore.exists()) {
+        storePassword = envStorePass
+        keyAlias = envKeyAlias ?: "upload"
+        keyPassword = envKeyPass ?: envStorePass
+      } else if (uploadKeystore.exists() && envStorePass != null) {
         storeFile = uploadKeystore
-        storePassword = System.getenv("KEYSTORE_PASSWORD") ?: System.getenv("STORE_PASSWORD") ?: ""
-        keyAlias = System.getenv("KEY_ALIAS") ?: "upload"
-        keyPassword = System.getenv("KEY_PASSWORD") ?: ""
+        storePassword = envStorePass
+        keyAlias = envKeyAlias ?: "upload"
+        keyPassword = envKeyPass ?: envStorePass
+      } else if (debugKeystore.exists()) {
+        storeFile = debugKeystore
+        storePassword = "android"
+        keyAlias = "androiddebugkey"
+        keyPassword = "android"
       } else {
-        val debugKeystore = file("${rootDir}/debug.keystore")
-        if (debugKeystore.exists()) {
-          storeFile = debugKeystore
-          storePassword = "android"
-          keyAlias = "androiddebugkey"
-          keyPassword = "android"
-        }
+        storeFile = file("${rootDir}/debug.keystore")
+        storePassword = "android"
+        keyAlias = "androiddebugkey"
+        keyPassword = "android"
       }
     }
     create("debugConfig") {
